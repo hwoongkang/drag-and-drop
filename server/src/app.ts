@@ -4,6 +4,16 @@ import logger from "morgan";
 
 import rootRouter from "./routes";
 
+import db from "./config/database";
+
+// db
+db.authenticate()
+  .then(() => console.log("database successfully conneted"))
+  .catch((err) => {
+    console.log("data base not connected");
+    console.error(err);
+  });
+
 const app = express();
 
 // middlewares

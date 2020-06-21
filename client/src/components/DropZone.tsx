@@ -1,7 +1,15 @@
-import React, { DragEvent, useState, MouseEvent } from "react";
+import React, {
+  DragEvent,
+  useState,
+  MouseEvent,
+  FormEvent,
+  useRef,
+} from "react";
 import styled from "styled-components";
 
 import Axios from "axios";
+import { useSetRecoilState } from "recoil";
+import { imagesState } from "../store/images";
 
 const Column = styled.div`
   display: flex;
@@ -32,7 +40,9 @@ const Row = styled.div`
   border-style: ${(props: IRowProps) => props.borderStyle ?? "none"};
 
   background-color: ${(props: IRowProps) =>
-    props.dragOver ? "rgba(200,200,255,0.3)" : "transparent"};
+    props.dragOver ? "rgba(200,200,255,0.2)" : "transparent"};
+
+  cursor: ${(props: IRowProps) => (props.dragOver ? "pointer" : "auto")};
 `;
 
 interface IButtonProps {
@@ -49,6 +59,15 @@ const Button = styled.button`
 const DropZone = () => {
   const [dragOver, setDragOver] = useState(false);
   const [file, setFile] = useState<File | undefined>(undefined);
+
+  const setImages = useSetRecoilState(imagesState);
+
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  const handleForm = (e: FormEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setFile(e.currentTarget.files?.[0]);
+  };
 
   const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -67,6 +86,7 @@ const DropZone = () => {
       .then((res) => {
         alert("file successfully uploaded");
         setFile(undefined);
+        setImages((images) => [...images, res.data.image]);
       })
       .catch((err) => {
         alert(`file couldn't be uploaded: ${err.message}`);
@@ -81,7 +101,6 @@ const DropZone = () => {
         onDragOver={(e: DragEvent<HTMLDivElement>) => {
           e.preventDefault();
           setDragOver(true);
-          console.log("Over!");
         }}
         onDragLeave={(e: DragEvent<HTMLDivElement>) => {
           e.preventDefault();
@@ -91,8 +110,25 @@ const DropZone = () => {
           e.preventDefault();
 
           const possibleFile = e.dataTransfer.files[0];
+          if (possibleFile.type.split("/")[0] !== "image") {
+            alert("Only image files are allowed");
+            return;
+          }
 
           setFile(possibleFile);
+          setDragOver(false);
+        }}
+        onMouseEnter={(e: MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          setDragOver(false);
+        }}
+        onClick={(e: MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          fileInput.current?.click();
           setDragOver(false);
         }}
         dragOver={dragOver}
@@ -101,6 +137,7 @@ const DropZone = () => {
           backgroundSize: "contain",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
+          fontSize: "3em",
         }}
       >
         {file ? null : "+"}
@@ -110,6 +147,13 @@ const DropZone = () => {
           Upload
         </Button>
       </Row>
+      <input
+        type="file"
+        style={{ width: 0, height: 0, overflow: "hidden", display: "none" }}
+        onChange={handleForm}
+        ref={fileInput}
+        accept="image/*"
+      />
     </Column>
   );
 };
