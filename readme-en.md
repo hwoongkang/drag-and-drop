@@ -1,5 +1,7 @@
 # Send image to the server using drag-and-drop
 
+![screenshot](./images/screenshot.png)
+
 It is an excercise project in my portfolio-site admin tool research.  
 Using React for the frontend and Express for the backend, uploading images to the server and serving them is implemented.
 

@@ -1,5 +1,7 @@
 # 드래그 앤 드롭하여 이미지 서버로 보내기
 
+![screenshot](./images/screenshot.png)
+
 - English readme is [here](./readme-en.md)
 
 Wordpress-like 관리자 도구를 만들기 위한 연습 중 첫 번째 단계로, Frontend에 React, Backend에 Express를 사용하여, 이미지를 저장 및 serve합니다.
